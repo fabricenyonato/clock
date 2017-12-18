@@ -1,0 +1,10 @@
+@import url('./ShowcardGothic.ttf');
+body {
+    margin: 0px;
+    cursor: none;
+}
+canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
