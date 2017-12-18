@@ -20,6 +20,12 @@
         ctx.canvas.width = ctx.canvas.clientWidth;
         ctx.canvas.height = ctx.canvas.clientHeight;
     }
+    function updateCurrentTime() {
+        var date = new Date;
+        currentTime.second = date.getSeconds();
+        currentTime.minute = date.getMinutes();
+        currentTime.hour = date.getHours();
+    }
     function initContext() {
         ctx = document.querySelector('#canvas').getContext('2d');
         resizeCanvas();
@@ -39,37 +45,42 @@
     }
     function draw() {
         clearContext();
+        updateCurrentTime();
         blackBackRectangle.fill();
+        // clockCircle.stroke();
         var hd;
+        var md;
         for (var _i = 0, hourDataArray_1 = hourDataArray; _i < hourDataArray_1.length; _i++) {
             var _hd = hourDataArray_1[_i];
-            if ((_hd.text.text === '12' ? 0 : parseInt(_hd.text.text, 10)) === ((new Date).getHours() >= 12 ? (new Date).getHours() - 12 : (new Date).getHours())) {
-                _hd.circle.radius = 65;
-                _hd.circle.fill();
+            if ((_hd.text.text === '12' ? 0 : parseInt(_hd.text.text, 10)) === (currentTime.hour >= 12 ? currentTime.hour - 12 : currentTime.hour)) {
+                _hd.circle.radius = 60;
                 hd = _hd;
             }
-            else {
+            else
                 _hd.circle.radius = 45;
-                _hd.circle.fill();
-            }
+            _hd.circle.fill();
+            _hd.text.fill();
         }
         hd.text.fill();
-        for (var _a = 0, secondDataArray_1 = secondDataArray; _a < secondDataArray_1.length; _a++) {
-            var secondData = secondDataArray_1[_a];
-            secondData.text.fill();
+        for (var _a = 0, minuteDataArray_1 = minuteDataArray; _a < minuteDataArray_1.length; _a++) {
+            var _md = minuteDataArray_1[_a];
+            if (parseInt(_md.text.text, 10) === currentTime.minute) {
+                md = _md;
+            }
         }
-        for (var _b = 0, hourDataArray_2 = hourDataArray; _b < hourDataArray_2.length; _b++) {
-            var hourData = hourDataArray_2[_b];
-            hourData.text.fill();
+        // md.circle.radius = 20;
+        md.circle.stroke();
+        for (var _b = 0, secondDataArray_1 = secondDataArray; _b < secondDataArray_1.length; _b++) {
+            var sd = secondDataArray_1[_b];
+            if (parseInt(sd.text.text, 10) === currentTime.second) {
+                sd.text.font = '25px Showcard Gothic';
+                sd.needle.stroke();
+            }
+            else
+                sd.text.font = '14px Showcard Gothic';
+            sd.text.fill();
         }
-        var s = secondDataArray.find(function (e) {
-            return parseInt(e.text.text, 10) === (new Date).getSeconds();
-        });
-        s.needle.stroke();
-        var m = minuteDataArray.find(function (e) {
-            return parseInt(e.text.text, 10) === (new Date).getMinutes();
-        });
-        m.needle.stroke();
+        md.needle.stroke();
         hd.needle.stroke();
         centerCircle.fill();
     }
@@ -108,11 +119,8 @@
         return pc;
     }
     function initTime() {
-        var date = new Date;
-        currentTime.second = date.getSeconds();
-        currentTime.minute = date.getMinutes();
-        currentTime.hour = date.getHours();
-        secondDataArray = initTimeDataArray(maxSeconds, secondsDegreeInterval, clockRadius - 15, '#8cbe51', 5, clockRadius, { font: '15px Showcard Gothic', textColor: '#fff' });
+        updateCurrentTime();
+        secondDataArray = initTimeDataArray(maxSeconds, secondsDegreeInterval, clockRadius - 20, '#8cbe51', 5, clockRadius, { font: '15px Showcard Gothic', textColor: '#BFBFBF' });
         secondDataArray.find(function (_sd) {
             return _sd.text.text === '0';
         }).text.text = '00';
@@ -121,9 +129,14 @@
         hourDataArray.find(function (_hd) {
             return _hd.text.text === '0';
         }).text.text = '12';
+        //init minuteDataArray[].circle
+        for (var i in minuteDataArray)
+            minuteDataArray[i].circle = new Circle(ctx, 15, secondDataArray[i].text.point, { strokeStyle: minuteCicleStyleArray[i], width: 5 });
         //init hourDataArray[].circle
         for (var i in hourDataArray)
             hourDataArray[i].circle = new Circle(ctx, 45, hourDataArray[i].text.point, { fillStyle: hourCicleStyleArray[i] });
+        //init clockCircle
+        // clockCircle = new Circle(ctx, clockRadius, convertPointToCanvasOrigin(new Point), {strokeStyle: '#fff', width: 2});
         //init centerCircle
         centerCircle = new Circle(ctx, 5, convertPointToCanvasOrigin(new Point), { fillStyle: '#fff' });
         //init blackBackRectangle
@@ -302,9 +315,11 @@
     var minuteDataArray = [];
     var hourDataArray = [];
     var hourCicleStyleArray = ['#63f7db', '#8004f2', '#d82141', '#384a40', '#944ef0', '#d50fc1', '#92d8ea', '#249104', '#67a07e', '#47a965', '#ba9796', '#436c42'];
+    var minuteCicleStyleArray = ['#4e4cf5', '#309a8a', '#49a196', '#5c756a', '#287db8', '#cbfc78', '#2ff277', '#9af532', '#16a9ca', '#62b5c5', '#8c018b', '#c67d4d', '#d0bc7e', '#234662', '#eb7fdc', '#8c05e1', '#5a3e6a', '#8caaaf', '#d1e26e', '#01399a', '#69b587', '#e7acf3', '#40134d', '#4c3454', '#66d319', '#618d02', '#623f2a', '#975e10', '#fb4b35', '#669b4f', '#671d1c', '#b5c479', '#b98037', '#49089e', '#c0977c', '#5207a2', '#37fb2f', '#c6ddf4', '#80664a', '#40f72a', '#7a9a33', '#783512', '#528df9', '#25952a', '#b77e04', '#ae7f3f', '#190568', '#899605', '#d137ff', '#fb1eb5', '#a73bb3', '#6e16d3', '#79145a', '#630048', '#40aac0', '#078454', '#2fa18f', '#c08375', '#fceeba', '#9c367d'];
     var intervalId;
     var animationFrameId;
     var centerCircle;
+    // let clockCircle: Circle;
     var blackBackRectangle;
     addEventListener('load', onLoad, false);
     addEventListener('resize', onResize, false);

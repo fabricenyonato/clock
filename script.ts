@@ -28,6 +28,14 @@
     }
 
 
+    function updateCurrentTime() {
+        let date = new Date;
+        currentTime.second = date.getSeconds();
+        currentTime.minute = date.getMinutes();
+        currentTime.hour = date.getHours();
+    }
+
+
     function initContext() {
         ctx = (document.querySelector('#canvas') as HTMLCanvasElement).getContext('2d');
         resizeCanvas();
@@ -54,38 +62,44 @@
 
     function draw() {
         clearContext();
-
+        updateCurrentTime();
         blackBackRectangle.fill();
+        // clockCircle.stroke();
 
         let hd: TimeData;
+        let md: TimeData;
 
         for (let _hd of hourDataArray) {
-            if ((_hd.text.text === '12' ? 0 : parseInt(_hd.text.text, 10)) === ((new Date).getHours() >= 12 ? (new Date).getHours() - 12 : (new Date).getHours())) {
-                _hd.circle.radius = 65;
-                _hd.circle.fill();
-
+            if ((_hd.text.text === '12' ? 0 : parseInt(_hd.text.text, 10)) === (currentTime.hour >= 12 ? currentTime.hour - 12 : currentTime.hour)) {
+                _hd.circle.radius = 60;
                 hd = _hd;
-            } else {
-                _hd.circle.radius = 45;
-                _hd.circle.fill();
-            }
+            } else _hd.circle.radius = 45;
+            _hd.circle.fill();
+            _hd.text.fill();
         }
         
         hd.text.fill();
 
-        for (let secondData of secondDataArray) secondData.text.fill();
-        for (let hourData of hourDataArray) hourData.text.fill();
+        for (let _md of minuteDataArray) {
+            if (parseInt(_md.text.text, 10) === currentTime.minute) {
+                md = _md;
+            }
+        }
 
-        let s = secondDataArray.find((e) => {
-            return parseInt(e.text.text, 10) === (new Date).getSeconds();
-        });
-        s.needle.stroke();
+        // md.circle.radius = 20;
+        md.circle.stroke();
 
-        let m = minuteDataArray.find((e) => {
-            return parseInt(e.text.text, 10) === (new Date).getMinutes();
-        });
-        m.needle.stroke();
+        for (let sd of secondDataArray) {
+            if (parseInt(sd.text.text, 10) === currentTime.second) {
+                sd.text.font = '25px Showcard Gothic';
+                sd.needle.stroke();
+            }
+            else sd.text.font = '14px Showcard Gothic';
 
+            sd.text.fill();
+        }
+
+        md.needle.stroke();
         hd.needle.stroke();
 
         centerCircle.fill();
@@ -149,12 +163,9 @@
 
 
     function initTime() {
-        let date = new Date;
-        currentTime.second = date.getSeconds();
-        currentTime.minute = date.getMinutes();
-        currentTime.hour = date.getHours();
+        updateCurrentTime();
 
-        secondDataArray = initTimeDataArray(maxSeconds, secondsDegreeInterval, clockRadius - 15, '#8cbe51', 5, clockRadius, {font: '15px Showcard Gothic', textColor: '#fff'});
+        secondDataArray = initTimeDataArray(maxSeconds, secondsDegreeInterval, clockRadius - 20, '#8cbe51', 5, clockRadius, {font: '15px Showcard Gothic', textColor: '#BFBFBF'});
         secondDataArray.find((_sd) => {
             return _sd.text.text === '0';
         }).text.text = '00';
@@ -166,9 +177,14 @@
             return _hd.text.text === '0';
         }).text.text = '12';
 
+        //init minuteDataArray[].circle
+        for (let i in minuteDataArray) minuteDataArray[i].circle = new Circle(ctx, 15, secondDataArray[i].text.point, {strokeStyle: minuteCicleStyleArray[i], width:5});
+
         //init hourDataArray[].circle
-        for (let i in hourDataArray)
-            hourDataArray[i].circle = new Circle(ctx, 45, hourDataArray[i].text.point, {fillStyle: hourCicleStyleArray[i]});
+        for (let i in hourDataArray) hourDataArray[i].circle = new Circle(ctx, 45, hourDataArray[i].text.point, {fillStyle: hourCicleStyleArray[i]});
+
+        //init clockCircle
+        // clockCircle = new Circle(ctx, clockRadius, convertPointToCanvasOrigin(new Point), {strokeStyle: '#fff', width: 2});
 
         //init centerCircle
         centerCircle = new Circle(ctx, 5, convertPointToCanvasOrigin(new Point), {fillStyle: '#fff'});
@@ -386,9 +402,11 @@
     let minuteDataArray: TimeData[] = [];
     let hourDataArray: TimeData[] = [];
     let hourCicleStyleArray: string[] = ['#63f7db', '#8004f2', '#d82141', '#384a40', '#944ef0', '#d50fc1', '#92d8ea', '#249104', '#67a07e', '#47a965', '#ba9796', '#436c42'];
+    let minuteCicleStyleArray: string[] = ['#4e4cf5', '#309a8a', '#49a196', '#5c756a', '#287db8', '#cbfc78', '#2ff277', '#9af532', '#16a9ca', '#62b5c5', '#8c018b', '#c67d4d', '#d0bc7e', '#234662', '#eb7fdc', '#8c05e1', '#5a3e6a', '#8caaaf', '#d1e26e', '#01399a', '#69b587', '#e7acf3', '#40134d', '#4c3454', '#66d319', '#618d02', '#623f2a', '#975e10', '#fb4b35', '#669b4f', '#671d1c', '#b5c479', '#b98037', '#49089e', '#c0977c', '#5207a2', '#37fb2f', '#c6ddf4', '#80664a', '#40f72a', '#7a9a33', '#783512', '#528df9', '#25952a', '#b77e04', '#ae7f3f', '#190568', '#899605', '#d137ff', '#fb1eb5', '#a73bb3', '#6e16d3', '#79145a', '#630048', '#40aac0', '#078454', '#2fa18f', '#c08375', '#fceeba', '#9c367d'];
     let intervalId: number;
     let animationFrameId: number;
     let centerCircle: Circle;
+    // let clockCircle: Circle;
     let blackBackRectangle: Rectangle;
 
     addEventListener('load', onLoad, false);
