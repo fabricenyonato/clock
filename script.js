@@ -6,8 +6,7 @@
     function init() {
         initContext();
         clearContext();
-        clearInterval(intervalId);
-        // cancelAnimationFrame(intervalId);
+        cancelAnimationFrame(animationFrameId);
         initTime();
         draw();
         animate();
@@ -38,10 +37,8 @@
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
     function animate() {
-        // animationFrameId = requestAnimationFrame(animate);
-        intervalId = setInterval(function () {
-            draw();
-        }, 1000);
+        animationFrameId = requestAnimationFrame(animate);
+        draw();
     }
     function draw() {
         clearContext();
@@ -316,7 +313,6 @@
     var hourDataArray = [];
     var hourCicleStyleArray = ['#63f7db', '#8004f2', '#d82141', '#384a40', '#944ef0', '#d50fc1', '#92d8ea', '#249104', '#67a07e', '#47a965', '#ba9796', '#436c42'];
     var minuteCicleStyleArray = ['#4e4cf5', '#309a8a', '#49a196', '#5c756a', '#287db8', '#cbfc78', '#2ff277', '#9af532', '#16a9ca', '#62b5c5', '#8c018b', '#c67d4d', '#d0bc7e', '#234662', '#eb7fdc', '#8c05e1', '#5a3e6a', '#8caaaf', '#d1e26e', '#01399a', '#69b587', '#e7acf3', '#40134d', '#4c3454', '#66d319', '#618d02', '#623f2a', '#975e10', '#fb4b35', '#669b4f', '#671d1c', '#b5c479', '#b98037', '#49089e', '#c0977c', '#5207a2', '#37fb2f', '#c6ddf4', '#80664a', '#40f72a', '#7a9a33', '#783512', '#528df9', '#25952a', '#b77e04', '#ae7f3f', '#190568', '#899605', '#d137ff', '#fb1eb5', '#a73bb3', '#6e16d3', '#79145a', '#630048', '#40aac0', '#078454', '#2fa18f', '#c08375', '#fceeba', '#9c367d'];
-    var intervalId;
     var animationFrameId;
     var centerCircle;
     // let clockCircle: Circle;
