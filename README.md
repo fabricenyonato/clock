@@ -1,1 +1,1 @@
-<h1>Open 'index.html' in a browser.</h1>
+<a href="https://fabricenyonato.github.io/clock/">https://fabricenyonato.github.io/clock/</a>
